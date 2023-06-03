@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const bcrypt = require('bcrypt');
 const { validationResult, matchedData } = require('express-validator');
 
 const User = require('../models/User');
@@ -41,6 +42,21 @@ module.exports = {
             });
             return;
         }
+
+        const passwordHash = await bcrypt.hash(data.password, 10);
+        const payLoad = (Date.now() + Math.random()).toString();
+        const token = await bcrypt.hash(payLoad, 10);
+
+        const newUser = new User({
+            name: data.name,
+            email: data.email,
+            passwordHash,
+            token,
+            state: data.state
+        });
+        await newUser.save();
+
+        res.json({token});
 
         res.json({allRight: true});
     },
