@@ -1,4 +1,4 @@
-const uuid = require('uuid');
+const {v4: uuid} = require('uuid');
 const jimp = require('jimp');
 
 const Category = require('../models/Category');
