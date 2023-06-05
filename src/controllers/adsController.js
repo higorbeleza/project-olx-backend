@@ -1,4 +1,4 @@
-const uuid = require('uuid/v4');
+const uuid = require('uuid');
 const jimp = require('jimp');
 
 const Category = require('../models/Category');
@@ -58,8 +58,28 @@ module.exports = {
 
         if(req.files && req.files.img) {
             if(req.files.img.lenght == undefined) {
-
+                if(['image/jpeg', 'image/jpg', 'image/png'].includes(req.files.img.mimetype)) {
+                    let url = await addImage(req.files.img.data);
+                    newAd.image.push({
+                        url,
+                        default: true
+                    });
+                }
+            }else {
+                for(let i=0; i<req.files.img.lenght; i++) {
+                    if(['image/jpeg', 'image/jpg', 'image/png'].includes(req.files.img[i].mimetype)) {
+                        let url = await addImage(req.files.img[i].data);
+                        newAd.image.push({
+                            url,
+                            default: true
+                        });
+                    }
+                }
             }
+        }
+
+        if(newAd.images.lenght > 0) {
+            newAd.images[0].default = true;
         }
 
         const info = await newAd.save();
