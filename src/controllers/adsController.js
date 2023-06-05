@@ -1,6 +1,17 @@
+const uuid = require('uuid/v4');
+const jimp = require('jimp');
+
 const Category = require('../models/Category');
 const User = require('../models/User');
 const Ad = require('../models/Ad');
+
+const addImage = async (buffer) => {
+    let newName = `${uuid()}.jpg`;
+    let tmpImg = await jimp.read(buffer);
+    tmpImg.cover(500, 500).quality(80).write(`./public/media/${newName}`);
+
+    return newName;
+}
 
 module.exports = {
     getCategories: async (req, res) => {
@@ -44,6 +55,15 @@ module.exports = {
         newAd.priceNegotiable = (priceneg=='true') ? true:false;
         newAd.description = desc;
         newAd.views = 0;
+
+        if(req.files && req.files.img) {
+            if(req.files.img.lenght == undefined) {
+
+            }
+        }
+
+        const info = await newAd.save();
+        res.json({id: info._id});
     },
     getList: async (req, res) => {
 
