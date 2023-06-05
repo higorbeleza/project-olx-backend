@@ -86,7 +86,30 @@ module.exports = {
         res.json({id: info._id});
     },
     getList: async (req, res) => {
+        let {sort = 'asc', offset = 0, limit = 8, q, cat, state} = req.query;
 
+        const adsData = await Ad.find({status: true}).exec();
+        let ads = [];
+        for(let i in adsData) {
+            let image;
+
+            let defaultImg = adsData[i].images.find(e => e.default);
+            if(defaultImg) {
+                image = `${process.env.BASE}/media/${defaultImg.url}`;
+            }else {
+                image = `${process.env.BASE}/media/default.jpg`;
+            }
+
+            ads.push({
+                id: adsData[i]._id,
+                title: adsData[i].title,
+                price: adsData[i].price,
+                priceNegotiable: adsData[i].priceNegotiable,
+                image
+            });
+        }
+
+        res.json({ads});
     },
     getItem: async (req, res) => {
 
