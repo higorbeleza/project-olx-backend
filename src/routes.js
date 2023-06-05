@@ -4,6 +4,7 @@ const router = express.Router();
 const Auth = require('./middlewares/Auth');
 
 const AuthValidator = require('./validators/AuthValidators');
+const UserValidator = require('./validators/UserValidator');
 
 const AuthController = require('./controllers/authController');
 const UserController = require('./controllers/userController');
@@ -19,7 +20,7 @@ router.post('/user/signin', AuthValidator.signin, AuthController.signin);
 router.post('/user/signup', AuthValidator.signup, AuthController.signup);
 
 router.get('/user/me', Auth.private, UserController.info);
-router.put('/user/me', Auth.private, UserController.editAction);
+router.put('/user/me', UserValidator.editAction, Auth.private, UserController.editAction);
 
 router.get('/categories', AdsController.getCategories);
 
