@@ -171,6 +171,30 @@ module.exports = {
         let userInfo = await User.findById(ad.idUser).exec();
         let stateInfo = await stateModel.findById(ad.state).exec();
 
+        let others = [];
+        if(other) {
+            const otherData = await Ad.find({status: true, idUser: ad.idUser}).exec();
+
+            for(let i in otherData) {
+                if(otherData[i]._id.toString() != ad._id.toString()) {
+                    let image = `${process.env.BASE}/media/default.jpg`;
+
+                    let defaultImg = otherData[i].images.find(e => e.default);
+                    if(defaultImg) {
+                        image = `${process.env.BASE}/media/${defaultImg.url}`;
+                    }
+
+                    others.push({
+                        id: otherData[i]._id,
+                        title: otherData[i].title,
+                        price: otherData[i].price,
+                        priceNegotiable: otherData[i].priceNegotiable,
+                        images
+                    });
+                }
+            }
+        }
+
         res.json({
             id: ad._id,
             title: ad.title,
@@ -185,7 +209,8 @@ module.exports = {
                 name: userInfo.name,
                 email: userInfo.email
             },
-            stateName: stateInfo.name
+            stateName: stateInfo.name,
+            others
         });
     },
     editAction: async (req, res) => {
