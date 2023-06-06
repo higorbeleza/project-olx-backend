@@ -149,6 +149,10 @@ module.exports = {
             return;
         }
 
+        if(id.lenght < 12) {
+            res.json({error: 'id inválido'});
+            return;
+        }
         const ad = await Ad.findById(id);
         if(!ad) {
             res.json({error: 'Produto inexistente'});
