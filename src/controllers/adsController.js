@@ -5,6 +5,7 @@ const Category = require('../models/Category');
 const stateModel = require('../models/State');
 const User = require('../models/User');
 const Ad = require('../models/Ad');
+const State = require('../models/State');
 
 const addImage = async (buffer) => {
     let newName = `${uuid()}.jpg`;
@@ -141,7 +142,47 @@ module.exports = {
         res.json({ads, total});
     },
     getItem: async (req, res) => {
+        let {id, other = null} = req.query;
 
+        if(!id) {
+            res.json({error: 'Sem produto'});
+            return;
+        }
+
+        const ad = await Ad.findById(id);
+        if(!ad) {
+            res.json({error: 'Produto inexistente'});
+            return;
+        }
+
+        ad.views++;
+        await ad.save();
+
+        let images = [];
+        for(let i in ad.images) {
+            images.push(`${process.env.BASE}/media/${ad.images[i].url}`);
+        }
+
+        let category = await Category.findById(ad.category).exec();
+        let userInfo = await User.findById(ad.idUser).exec();
+        let stateInfo = await stateModel.findById(ad.state).exec();
+
+        res.json({
+            id: ad._id,
+            title: ad.title,
+            price: ad.price,
+            priceNegotiable: ad.priceNegotiable,
+            description: ad.description,
+            dateCreated: ad.dateCreated,
+            views: ad.views,
+            images,
+            category,
+            userInfo: {
+                name: userInfo.name,
+                email: userInfo.email
+            },
+            stateName: stateInfo.name
+        });
     },
     editAction: async (req, res) => {
         
